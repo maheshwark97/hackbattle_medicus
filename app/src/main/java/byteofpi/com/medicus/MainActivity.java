@@ -3,20 +3,18 @@ package byteofpi.com.medicus;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
-import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.widget.TextView;
+import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -27,7 +25,10 @@ public class MainActivity extends AppCompatActivity {
     SpeechRecognizer speech;
     FloatingActionButton button;
     TextView txtSpeechInput;
+    private TextToSpeech tts;
+
     private final int REQ_CODE_SPEECH_INPUT = 100;
+    String OUTPUT;
     static {
         System.loadLibrary("native-lib");
     }
@@ -36,30 +37,50 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        TextToSpeech.OnInitListener listener =
+                new TextToSpeech.OnInitListener() {
+                    @Override
+                    public void onInit(final int status) {
+                        if (status == TextToSpeech.SUCCESS) {
+                            Log.d("OnInitListener", "Text to speech engine started successfully.");
+                            tts.setLanguage(Locale.US);
+                        } else {
+                            Log.d("OnInitListener", "Error starting the text to speech engine.");
+                        }
+                    }
+                };
+        tts = new TextToSpeech(this.getApplicationContext(), listener);
         txtSpeechInput=(TextView)findViewById(R.id.sample_text);
         button=(FloatingActionButton)findViewById(R.id.btnRecord);
         speech=SpeechRecognizer.createSpeechRecognizer(getApplicationContext());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         button.setOnClickListener(new View.OnClickListener() {
-
-            @Override
+        @Override
             public void onClick(View v) {
+                tts.speak("Are You Visually Impaired", TextToSpeech.QUEUE_ADD, null, "DEFAULT");
                 promptSpeechInput();
             }
         });
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.yes_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent ji=new Intent(MainActivity.this,OcrCaptureActivity.class);
+                startActivity(ji);
+            }
+        });
+        findViewById(R.id.no_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent ij=new Intent(MainActivity.this,DetailsActivity.class);
+                startActivity(ij);
             }
         });
 
+
         // Example of a call to a native method
-        TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
+        //TextView tv = (TextView) findViewById(R.id.sample_text);
+        //tv.setText(stringFromJNI());
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -71,7 +92,16 @@ public class MainActivity extends AppCompatActivity {
 
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    OUTPUT=result.get(0);
                     txtSpeechInput.setText(result.get(0));
+                }
+                if("no".equals(OUTPUT.toLowerCase())) {
+                    Intent ij=new Intent(this,DetailsActivity.class);
+                    startActivity(ij);
+                }
+                if("yes".equals(OUTPUT.toLowerCase())){
+                    Intent ji=new Intent(this,OcrCaptureActivity.class);
+                    startActivity(ji);
                 }
                 break;
             }
