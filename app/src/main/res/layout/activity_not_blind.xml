@@ -6,12 +6,53 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    tools:openDrawer="start"
+    android:background="#c8e6c9">
 
     <include
         layout="@layout/app_bar_not_blind"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:id="@+id/avi_layout"
+        android:background="#55000000"
+        android:clickable="true"
+        android:elevation="3dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:id="@+id/LoadingText"
+            android:visibility="visible"
+            android:layout_above="@+id/avi"
+            android:text="Loading Details..."
+            android:theme="@style/AppTheme3"
+            android:textColor="#ffffff"
+            android:background="@android:color/transparent"
+            android:textSize="20sp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="15dp"/>
+        <com.wang.avi.AVLoadingIndicatorView
+            android:id="@+id/avi"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            style="@style/AVLoadingIndicatorView"
+            android:visibility="visible"
+            android:theme="@style/AppTheme3"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            app:indicatorName="BallClipRotatePulseIndicator"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            />
+    </RelativeLayout>
+
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
@@ -19,7 +60,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_not_blind"
         app:menu="@menu/activity_not_blind_drawer" />
 
 </android.support.v4.widget.DrawerLayout>
